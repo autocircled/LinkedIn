@@ -9,7 +9,6 @@ from datetime import datetime, timedelta
 import os
 import io
 
-# started new tech
 # get redirected URL from LinkedIn
 import re
 from urllib.parse import unquote
@@ -19,7 +18,7 @@ seed(1)
 sequence = [(i+7) for i in range(8)]
 print(sequence)
 # check if previously added any minutes
-count_minutes = Path("min-count")
+count_minutes = Path("min-count.txt")
 if os.path.getsize(count_minutes) > 0:
 	p = open(count_minutes, "r")
 	q = p.readlines()
@@ -27,19 +26,24 @@ if os.path.getsize(count_minutes) > 0:
 else:
 	random_mins = 0
 	
-print(random_mins)
+#print(random_mins)
+
+# open HTTP connection
+def openConnection(url):
+	# open connection and grabbing the page
+	uClient = uReq(url)
+	page_html = uClient.read()
+	uClient.close()
+	return page_html
 
 def scrap(url):
 	global random_mins
 	random_mins += choice(sequence)
 	now = datetime.now() + timedelta(hours= -6)
 	now2 =  datetime.now() + timedelta(hours= -6, minutes=random_mins)
-	my_url = url
 
-	# open connection and grabbing the page
-	uClient = uReq(my_url)
-	page_html = uClient.read()
-	uClient.close()
+
+	page_html = openConnection(url)
 
 	# html parsing
 	page_soup = soup(page_html, "html.parser")
@@ -52,7 +56,7 @@ def scrap(url):
 	title = job_container.h1.text
 	
 	#link
-	link = my_url
+	link = url
 	link_found = 'no'
 	link_source = job_container.findAll("a", class_='apply-button apply-button--link', attrs={'data-tracking-control-name':'public_jobs_apply-link-offsite'})
 	# print(link_source[1].get('href'))
@@ -212,14 +216,34 @@ def scrap(url):
 		f.write("</item>\r")
 	
 		f.close()
-	min_calc = Path("min-count")
+	min_calc = Path("min-count.txt")
 	mcl=open(min_calc, "w")
 	mcl.write("%s" % (random_mins))
 	mcl.close()
 
-while True:
-	url = input("Give me a LinkedIn URL to scrap\r")
-	scrap(url)
-	print("Job successfully added!!!\r")
-	if(url == ""):
-		print("URL is empty")
+
+# started new technique
+
+html_data = soup(open("linkedin.html", encoding='utf8'), "html.parser")
+job_lists = html_data.findAll('li', attrs = {'class':'result-card'})
+count = 0
+links = {}
+for job in job_lists:
+	links[count] = job.a.get('href')
+	count = count + 1
+#print(links)	
+while len(links) > 0:
+	try:
+		#print(links[len(links)-1])
+		scrap(links[len(links)-1])
+		
+	except:
+		print("Something went wrong when writing to the file")
+		
+	print(len(links)-1)	
+	links.pop(len(links)-1)
+	#url = input("Give me a LinkedIn URL to scrap\r")
+	#scrap(url)
+	#print("Job successfully added!!!\r")
+	#if(url == ""):
+	#	print("URL is empty")
