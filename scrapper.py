@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 import os
 import io
 
+# started new tech
 # get redirected URL from LinkedIn
 import re
 from urllib.parse import unquote
