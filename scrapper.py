@@ -1,4 +1,5 @@
-from urllib.request import urlopen as uReq
+from urllib.request import urlopen
+# pip install beautifulsoup4
 from bs4 import BeautifulSoup as soup
 from pathlib import Path
 import json
@@ -15,7 +16,7 @@ from urllib.parse import unquote
 
 
 seed(1)
-sequence = [(i+7) for i in range(8)]
+sequence = [(i) for i in range(5)]
 print(sequence)
 # check if previously added any minutes
 count_minutes = Path("min-count.txt")
@@ -31,9 +32,9 @@ else:
 # open HTTP connection
 def openConnection(url):
 	# open connection and grabbing the page
-	uClient = uReq(url)
-	page_html = uClient.read()
-	uClient.close()
+	with urlopen(url) as uClient:
+                page_html = uClient.read()
+                uClient.close()
 	return page_html
 
 def scrap(url):
@@ -44,7 +45,6 @@ def scrap(url):
 
 
 	page_html = openConnection(url)
-
 	# html parsing
 	page_soup = soup(page_html, "html.parser")
 
@@ -99,9 +99,10 @@ def scrap(url):
 	job_industies_container = all_criterias[3].findAll('span')
 
 	# get json data
-	json_data = page_soup.find('script', type='application/ld+json').text
-	# Load as JSON
+	json_data = "".join(page_soup.find('script', {'type':'application/ld+json'}).contents)
 	j = json.loads(json_data)
+	# Load as JSON
+	# j = json.loads(json_data)
 	
 	# data parse
 	d = dateutil.parser.parse(j['validThrough'])
@@ -234,11 +235,11 @@ for job in job_lists:
 #print(links)	
 while len(links) > 0:
 	try:
-		#print(links[len(links)-1])
-		scrap(links[len(links)-1])
+                #print(links[len(links)-1])
+                scrap(links[len(links)-1])
 		
 	except:
-		print("Something went wrong when writing to the file")
+                print("Something went wrong when writing to the file")
 		
 	print(len(links)-1)	
 	links.pop(len(links)-1)
