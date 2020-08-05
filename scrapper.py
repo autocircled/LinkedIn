@@ -3,6 +3,7 @@ from urllib.request import urlopen
 from bs4 import BeautifulSoup as soup
 from pathlib import Path
 import json
+# pip install python-dateutil --user
 import dateutil.parser
 from random import seed
 from random import choice
@@ -16,7 +17,7 @@ from urllib.parse import unquote
 
 
 seed(1)
-sequence = [(i) for i in range(5)]
+sequence = [(i) for i in range(10)]
 print(sequence)
 # check if previously added any minutes
 count_minutes = Path("min-count.txt")
@@ -232,16 +233,23 @@ links = {}
 for job in job_lists:
 	links[count] = job.a.get('href')
 	count = count + 1
-#print(links)	
+#print(links)
+progress_path = Path("progress.txt")
+pp = open(progress_path, "w")
+pp.write("%s" % (len(links)))
+pp.close()
+
 while len(links) > 0:
+
 	try:
                 #print(links[len(links)-1])
                 scrap(links[len(links)-1])
 		
 	except:
                 print("Something went wrong when writing to the file")
-		
-	print(len(links)-1)	
+	
+    
+	print(len(links)-1)
 	links.pop(len(links)-1)
 	#url = input("Give me a LinkedIn URL to scrap\r")
 	#scrap(url)
