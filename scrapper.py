@@ -143,7 +143,7 @@ def scrap(url):
 			f.write("\t<category domain=\"location\" nicename=\"%s\"><![CDATA[%s]]></category>\r" % (location, location) )
 
 		# job_functions
-		count = 0;
+		count = 0
 		while (count < len(job_functions_container)):
 			value = job_functions_container[count].text
 			f.write("\t<category domain=\"job_type\" nicename=\"%s\"><![CDATA[%s]]></category>\r" % (value, value) )
