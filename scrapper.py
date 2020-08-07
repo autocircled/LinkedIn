@@ -54,7 +54,7 @@ def scrap(url):
 
 	# Job informations
 	#Title
-	title = job_container.h1.text
+	title = job_container.h2.text
 	
 	#link
 	link = url
