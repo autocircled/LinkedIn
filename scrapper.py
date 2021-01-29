@@ -5,8 +5,8 @@ from pathlib import Path
 import json
 # pip install python-dateutil --user
 import dateutil.parser
-from random import seed
-from random import choice
+import random
+from random import seed, choice
 from datetime import datetime, timedelta
 import os
 import io
@@ -227,13 +227,14 @@ def scrap(url):
 # started new technique
 
 html_data = soup(open("linkedin.html", encoding='utf8'), "html.parser")
-job_lists = html_data.findAll('li', attrs = {'class':'result-card'})
+job_lists = html_data.findAll('li', attrs = {'class':'jobs-search-results__list-item'})
 count = 0
 links = {}
-for job in job_lists:
-	links[count] = job.a.get('href')
+job_id = [job['data-occludable-entity-urn'] for job in job_lists if "data-occludable-entity-urn" in job.attrs]
+for id in job_id:
+	links[count] = 'https://www.linkedin.com/jobs/view/' + id[32:] + '/'
 	count = count + 1
-#print(links)
+
 progress_path = Path("progress.txt")
 pp = open(progress_path, "w")
 pp.write("%s" % (len(links)))
@@ -242,8 +243,8 @@ pp.close()
 while len(links) > 0:
 
 	try:
-                #print(links[len(links)-1])
-                scrap(links[len(links)-1])
+				random.shuffle(links)
+				scrap(links[len(links)-1])
 		
 	except:
                 print("Something went wrong when writing to the file")
@@ -251,8 +252,3 @@ while len(links) > 0:
     
 	print(len(links)-1)
 	links.pop(len(links)-1)
-	#url = input("Give me a LinkedIn URL to scrap\r")
-	#scrap(url)
-	#print("Job successfully added!!!\r")
-	#if(url == ""):
-	#	print("URL is empty")
