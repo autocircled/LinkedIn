@@ -230,31 +230,37 @@ def scrap(url):
 html_data = soup(open("linkedin.html", encoding='utf8'), "html.parser")
 job_lists = html_data.findAll('li', attrs = {'class':'result-card'})
 count = 0
-links = {}
-for job in job_lists:
-	links[count] = job.a.get('href')
-	count = count + 1
-#print(links)
+links = []
 progress_path = Path("progress.txt")
-pp = open(progress_path, "w")
-pp.write("%s" % (len(links)))
-pp.close()
+if os.path.getsize(progress_path) == 0:
+	for job in job_lists:
+		with io.open(progress_path, "a+", encoding="utf-8") as df:
+			df.write(job.a.get('href') + '\r')
+			df.close()
 
-while len(links) > 0:
+
+
+# if os.path.getsize(progress_path) == 0:
+# 	pp = open(progress_path, "w")
+# 	pp.write("%s" % (links))
+# 	pp.close()
+
+with open(progress_path) as ff1:
+	URLs = ff1.readlines()
+
+while len(URLs) > 0:
 
 	try:
-				random.shuffle(links)
-				print(links[len(links)-1])
-				scrap(links[len(links)-1])
+				random.shuffle(URLs)
+				print(URLs[len(URLs)-1])
+				scrap(URLs[len(URLs)-1])
 		
 	except:
                 print("Something went wrong when writing to the file")
 	
     
-	print(len(links)-1)
-	links.pop(len(links)-1)
-	#url = input("Give me a LinkedIn URL to scrap\r")
-	#scrap(url)
-	#print("Job successfully added!!!\r")
-	#if(url == ""):
-	#	print("URL is empty")
+	print(len(URLs)-1)
+	URLs.pop(len(URLs)-1)
+	with io.open(progress_path, "w", encoding="utf-8") as dff1:
+		dff1.write("%s" % (URLs))
+		dff1.close()
