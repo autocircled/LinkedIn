@@ -5,6 +5,7 @@ from pathlib import Path
 import json
 # pip install python-dateutil --user
 import dateutil.parser
+import random
 from random import seed
 from random import choice
 from datetime import datetime, timedelta
@@ -242,8 +243,9 @@ pp.close()
 while len(links) > 0:
 
 	try:
-                #print(links[len(links)-1])
-                scrap(links[len(links)-1])
+				random.shuffle(links)
+				print(links[len(links)-1])
+				scrap(links[len(links)-1])
 		
 	except:
                 print("Something went wrong when writing to the file")
