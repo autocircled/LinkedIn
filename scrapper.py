@@ -232,35 +232,53 @@ job_lists = html_data.findAll('li', attrs = {'class':'result-card'})
 count = 0
 links = []
 progress_path = Path("progress.txt")
-if os.path.getsize(progress_path) == 0:
-	for job in job_lists:
-		with io.open(progress_path, "a+", encoding="utf-8") as df:
-			df.write(job.a.get('href') + '\r')
-			df.close()
 
+# Checking if there is already links in the file
+if os.path.getsize(progress_path) == 0:
+	
+	# Creating a list of links
+	for job in job_lists:
+		links.append(job.a.get('href'))
+
+	# shuffle all the links
+	random.shuffle(links)
+	
+	# Opening file for store links to scrap
+	with io.open(progress_path, "w") as pp:
+
+		# Writing links in the file from list
+		for link in links:
+			pp.write( '%s\n' % link )
+
+		# After write all the links file closed
+		pp.close()
 
 
 # if os.path.getsize(progress_path) == 0:
 # 	pp = open(progress_path, "w")
 # 	pp.write("%s" % (links))
 # 	pp.close()
+ready_links = []
+with open(progress_path, 'r') as links:
+	#URLs = opp.readlines()
+	for link in links:
+		currentPlace = link[:-1]
+		ready_links.append(currentPlace)
 
-with open(progress_path) as ff1:
-	URLs = ff1.readlines()
-
-while len(URLs) > 0:
+while len(ready_links) > 0:
 
 	try:
-				random.shuffle(URLs)
-				print(URLs[len(URLs)-1])
-				scrap(URLs[len(URLs)-1])
+				#random.shuffle(ready_links)
+				print(ready_links[len(ready_links)-1])
+				scrap(ready_links[len(ready_links)-1])
 		
 	except:
                 print("Something went wrong when writing to the file")
 	
     
-	print(len(URLs)-1)
-	URLs.pop(len(URLs)-1)
+	print(len(ready_links)-1)
+	ready_links.pop(len(ready_links)-1)
 	with io.open(progress_path, "w", encoding="utf-8") as dff1:
-		dff1.write("%s" % (URLs))
+		for link in ready_links:
+			dff1.write("%s\n" % (link))
 		dff1.close()
