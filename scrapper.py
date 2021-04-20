@@ -18,16 +18,17 @@ from urllib.parse import unquote
 
 
 seed(1)
-sequence = [(i) for i in range(10)]
-print(sequence)
+#sequence = [(i) for i in range(10)]
+suffle_mins = [(i) for i in range(10)]
+print(suffle_mins)
 # check if previously added any minutes
-count_minutes = Path("min-count.txt")
-if os.path.getsize(count_minutes) > 0:
-	p = open(count_minutes, "r")
-	q = p.readlines()
-	random_mins = int(q[0])
-else:
-	random_mins = 0
+# count_minutes = Path("min-count.txt")
+# if os.path.getsize(count_minutes) > 0:
+# 	p = open(count_minutes, "r")
+# 	q = p.readlines()
+# 	random_mins = int(q[0])
+# else:
+# 	random_mins = 0
 	
 #print(random_mins)
 
@@ -40,10 +41,10 @@ def openConnection(url):
 	return page_html
 
 def scrap(url):
-	global random_mins
-	random_mins += choice(sequence)
+	# global random_mins
+	#random_mins += choice(sequence)
 	now = datetime.now() + timedelta(hours= -6)
-	now2 =  datetime.now() + timedelta(hours= -6, minutes=random_mins)
+	#now2 =  datetime.now() + timedelta(hours= -6, minutes=random_mins)
 
 
 	page_html = openConnection(url)
@@ -107,13 +108,24 @@ def scrap(url):
 	# j = json.loads(json_data)
 	
 	# data parse
+	datePosted_origin = dateutil.parser.parse(j['datePosted'])
+	
+	modified_dateposted = datePosted_origin + timedelta(minutes=-choice(suffle_mins))
+	# print(j)
+	j['datePosted'] = str(modified_dateposted)
+	k = json.dumps(j)
+	# print(k)
+	# print(datePosted_origin)
+	# print(modified_dateposted)
+	# exit()
 	d = dateutil.parser.parse(j['validThrough'])
 	
 	# new formatted date
 	dl = d.strftime('%Y%m%d') # deadline of job
-	st = now2.strftime("%Y-%m-%d %H:%M:%S")
-	ft = now2.strftime('%A, %d %b %Y %H:%M:%S')
-	rt = now2.strftime('%Y%m%d-%H%M%S')
+	st = modified_dateposted.strftime("%Y-%m-%d %H:%M:%S")
+	#ft = now2.strftime('%A, %d %b %Y %H:%M:%S')
+	ft = modified_dateposted.strftime('%A, %d %b %Y %H:%M:%S')
+	rt = modified_dateposted.strftime('%Y%m%d-%H%M%S')
 	ct = now.strftime('%Y%m%d') # Current year/month/day
 	
 	# check if deadline is over
@@ -198,7 +210,8 @@ def scrap(url):
 
 
 		# JSON DATA
-		f.write("\t<wp:postmeta>\r\t\t<wp:meta_key><![CDATA[json_from_linkedin]]></wp:meta_key>\r\t\t<wp:meta_value><![CDATA[<script type=\"application/ld+json\">%s</script>]]></wp:meta_value>\r\t</wp:postmeta>\r" % (json_data) )
+		# f.write("\t<wp:postmeta>\r\t\t<wp:meta_key><![CDATA[json_from_linkedin]]></wp:meta_key>\r\t\t<wp:meta_value><![CDATA[<script type=\"application/ld+json\">%s</script>]]></wp:meta_value>\r\t</wp:postmeta>\r" % (json_data) )
+		f.write("\t<wp:postmeta>\r\t\t<wp:meta_key><![CDATA[json_from_linkedin]]></wp:meta_key>\r\t\t<wp:meta_value><![CDATA[<script type=\"application/ld+json\">%s</script>]]></wp:meta_value>\r\t</wp:postmeta>\r" % (json.dumps(j)) )
 		f.write("\t<wp:postmeta>\r\t\t<wp:meta_key><![CDATA[_json_from_linkedin]]></wp:meta_key>\r\t\t<wp:meta_value><![CDATA[field_5de7c8cc966f6]]></wp:meta_value>\r\t</wp:postmeta>\r")
 		# Deadline 
 		f.write("\t<wp:postmeta>\r\t\t<wp:meta_key><![CDATA[deadline_job]]></wp:meta_key>\r\t\t<wp:meta_value><![CDATA[%s]]></wp:meta_value>\r\t</wp:postmeta>\r" % (dl))
@@ -266,7 +279,7 @@ with open(progress_path, 'r') as links:
 		ready_links.append(currentPlace)
 
 while len(ready_links) > 0:
-
+	# scrap(ready_links[len(ready_links)-1])
 	try:
 				#random.shuffle(ready_links)
 				print(ready_links[len(ready_links)-1])
