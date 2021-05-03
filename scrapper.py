@@ -241,7 +241,7 @@ def scrap(url):
 # started new technique
 
 html_data = soup(open("linkedin.html", encoding='utf8'), "html.parser")
-job_lists = html_data.findAll('li', attrs = {'class':'result-card'})
+job_lists = html_data.findAll('a', attrs = {'class':'base-card__full-link'})
 count = 0
 links = []
 progress_path = Path("progress.txt")
@@ -251,7 +251,7 @@ if os.path.getsize(progress_path) == 0:
 	
 	# Creating a list of links
 	for job in job_lists:
-		links.append(job.a.get('href'))
+		links.append(job.get('href'))
 
 	# shuffle all the links
 	random.shuffle(links)
